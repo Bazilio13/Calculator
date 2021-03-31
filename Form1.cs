@@ -15,7 +15,8 @@ namespace Calculator
     {
         string Tmp = "";
         string ActValue = "";
-        bool NewNumber = true;
+        bool IsNewNumber = true;
+        bool IsActNumber = false;
         char Act = ' ';
 
         public Form1()
@@ -25,9 +26,10 @@ namespace Calculator
 
         private void NumButton_Click(object sender, EventArgs e)
         {
-            if (NewNumber)
+            if (IsNewNumber)
             {
                 Display.Text = "";
+                EnableActButtones();
             }
             Button button = (Button)sender;
             if (Display.Text == "0")
@@ -38,24 +40,32 @@ namespace Calculator
             {
                 Display.Text += button.Text;
             }
-            NewNumber = false;
+            IsNewNumber = false;
+            if (IsActNumber)
+            {
+                ActValue = Display.Text;
+            }
         }
 
         private void ActButton_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             Tmp = Display.Text;
-            ActValue = Display.Text;
             Act = button.Text[0];
-            NewNumber = true;
+            ActValue = "";
+            IsNewNumber = true;
+            IsActNumber = true;
         }
 
         private void SolveButton_Click(object sender, EventArgs e)
         {
-            ActValue = Display.Text;
             if (Tmp == "")
             {
                 Tmp = Display.Text;
+            }
+            if (ActValue == "")
+            {
+                ActValue = Display.Text;
             }
             switch (Act)
             {
@@ -71,15 +81,19 @@ namespace Calculator
                 case '÷':
                     if (Convert.ToDouble(ActValue) == 0)
                     {
-                        Display.Text = "Деление на ноль невозможно";
                         DisableActButtones();
+                        Display.Text = "Деление на ноль невозможно";
                     }
                     else
                     {
                         Display.Text = (Convert.ToDouble(Tmp) / Convert.ToDouble(ActValue)).ToString();
                     }
                     break;
+                case ' ':
+                    return;
             }
+            IsNewNumber = true;
+            IsActNumber = false;
             Tmp = "";
         }
 
@@ -90,14 +104,15 @@ namespace Calculator
 
         private void CEButton_Click(object sender, EventArgs e)
         {
-            Display.Text = "";
+            Display.Text = "0";
         }
 
         private void CButton_Click(object sender, EventArgs e)
         {
-            Display.Text = "";
+            Display.Text = "0";
             Tmp = "";
             ActValue = "";
+            IsActNumber = false;
         }
         private void DisableActButtones()
         {
@@ -107,6 +122,7 @@ namespace Calculator
             divisionButton.Enabled = false;
             NumberSignButton.Enabled = false;
             decimalPointButton.Enabled = false;
+            Display.TextAlign = HorizontalAlignment.Center;
         }
         private void EnableActButtones()
         {
@@ -116,6 +132,7 @@ namespace Calculator
             divisionButton.Enabled = true;
             NumberSignButton.Enabled = true;
             decimalPointButton.Enabled = true;
+            Display.TextAlign = HorizontalAlignment.Right;
         }
 
         private void backspaceButton_Click(object sender, EventArgs e)
@@ -128,6 +145,10 @@ namespace Calculator
 
         private void decimalPointButton_Click(object sender, EventArgs e)
         {
+            if (IsNewNumber)
+            {
+                Display.Text = "";
+            }
             if (Display.Text == "")
             {
                 Display.Text = "0,";
@@ -140,6 +161,7 @@ namespace Calculator
                 }
 
             }
+            IsNewNumber = false;
         }
     }
 }
